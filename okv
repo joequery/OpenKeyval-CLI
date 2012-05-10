@@ -12,33 +12,65 @@ import sys
 from optparse import OptionParser
 from pyopenkeyval.pyopenkeyval import pyopenkeyval
 
-usage = "Usage: %prog [set|get|del] [args]"
-parser = OptionParser(usage=usage)
-parser.add_option("-k", "--key", dest="key", help="Key")
-parser.add_option("-v", "--value", dest="value", help="Value")
+def run():
+  okv = pyopenkeyval()
 
-(options, args) = parser.parse_args(sys.argv)
-operation = sys.argv[1]
-okv = pyopenkeyval()
+  # Usage message for --help or errors
+  usage = "Usage: %prog [set|get|del] [args]"
 
-if operation == 'set': 
-  try:
-    key = options.key
-    okv[key] = options.value
-  except:
+  # Get the values from the command line.
+  parser = OptionParser(usage=usage)
+  options = parse_arguments(parser)
+
+  # Get the key prefix 
+  prefix = get_key_prefix(options, parser)
+
+  # Exit out if operation not provided
+  if len(sys.argv) < 2:
+    parser.error("No operation was provided. Run `okv --help` for more info.")
     exit(1)
-elif operation == 'get':
-  try:
-    key = options.key
-    remoteVal = okv[key]
-    print(remoteVal)
-  except: 
-    exit(1)
-elif operation == 'del':
-  try:
-    key = options.key
-    del okv[key]
-  except: 
-    exit(1)
-else:
-	parser.error("Incorrect operation provided.")
+
+  operation = sys.argv[1]
+
+  if operation == 'set': 
+    execute_set(options, parser)
+  elif operation == 'get':
+    execute_get(options, parser)
+  elif operation == 'del':
+    execute_del(options, parser)
+  else:
+    parser.error("Incorrect operation provided.")
+
+# Set command line parser options
+def parse_arguments(parser):
+  parser.add_option("-k", "--key", dest="key", help="Key")
+  parser.add_option("-v", "--value", dest="value", help="Value")
+  parser.add_option("-n", "--no-prefix", action="store_true", dest="noPrefix", 
+      help="Do not use the prefix from the OKV_PREFIX environment variable")
+
+  (options, args) = parser.parse_args(sys.argv)
+  return options
+
+# Validate and execute the get operation
+def execute_get(options, parser):
+  print("Getting %s!" % options.key)
+
+# Validate and execute the set operation
+def execute_set(options, parser):
+  print("Setting %s!" % options.key)
+
+# Validate and execute the del operation
+def execute_del(options, parser):
+  print("Deleting %s!" % options.key)
+
+
+# Get the key prefix
+def get_key_prefix(options, parser):
+   # If the user specified to not use a prefix, return an empty string
+   if options.noPrefix:
+   	 return ""
+
+
+if __name__ == "__main__":
+	run()
+
