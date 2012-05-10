@@ -31,11 +31,11 @@ def run():
   operation = sys.argv[1]
 
   if operation == 'set': 
-    execute_set(options, parser)
+    execute_set(prefix, options, parser)
   elif operation == 'get':
-    execute_get(options, parser)
+    execute_get(prefix, options, parser)
   elif operation == 'del':
-    execute_del(options, parser)
+    execute_del(prefix, options, parser)
   else:
     parser.error("Incorrect operation provided.")
 
@@ -50,38 +50,54 @@ def parse_arguments(parser):
   return options
 
 # Validate and execute the get operation
-def execute_get(options, parser):
+def execute_get(prefix, options, parser):
+  if options.key == None:
+  	parser.error("Key required")
+  	exit(1)
   okv = pyopenkeyval()
-  print(okv[options.key])
+  key = "%s%s" %(prefix, options.key)
+  print(okv[key])
 
 # Validate and execute the set operation
-def execute_set(options, parser):
+def execute_set(prefix, options, parser):
+  if options.key == None:
+    parser.error("Key requried")
+    exit(1)
   if options.value == None:
     parser.error("Value requried")
     exit(1)
   okv = pyopenkeyval()
-  okv[options.key] = options.value
+  key = "%s%s" %(prefix, options.key)
+  okv[key] = options.value
 
 # Validate and execute the del operation
-def execute_del(options, parser):
+def execute_del(prefix, options, parser):
+  if options.key == None:
+    parser.error("Key required")
+    exit(1)
   okv = pyopenkeyval()
-  del okv[options.key]
+  key = "%s%s" %(prefix, options.key)
+  del okv[key]
 
 
 # Get the key prefix
 def get_key_prefix(options, parser):
-   # If the user specified to not use a prefix, prepand an empty string
-   # to the key. Otherwise, attempt to prepend the OKV_PREFIX environment
-   # variable to the key
+   # If the user specified to not use a prefix, return an empty string
+   # as the prefix. Otherwise, attempt to return the OKV_PREFIX environment
+   # variable as the prefix
    if options.noPrefix:
-   	 options.key = "" + options.key
+     return ''
    else:
      if "OKV_PREFIX" in os.environ.keys():
-       options.key = os.environ["OKV_PREFIX"] + "_" +  options.key 
+       return os.environ["OKV_PREFIX"]
      else:
      	 print("OKV_PREFIX environment variable not found but -n not passed")
      	 exit(1)
 
+# Specifal function to covert items to strings, with a special consideration
+# of None
+def xstr(s):
+  return '' if s is None else str(s)
 if __name__ == "__main__":
 	run()
 
