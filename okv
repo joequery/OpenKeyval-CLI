@@ -8,13 +8,11 @@
 # okv get -k someKey 
 ##################################################################
 
-import sys
+import sys, os
 from optparse import OptionParser
 from pyopenkeyval.pyopenkeyval import pyopenkeyval
 
 def run():
-  okv = pyopenkeyval()
-
   # Usage message for --help or errors
   usage = "Usage: %prog [set|get|del] [args]"
 
@@ -53,23 +51,36 @@ def parse_arguments(parser):
 
 # Validate and execute the get operation
 def execute_get(options, parser):
-  print("Getting %s!" % options.key)
+  okv = pyopenkeyval()
+  print(okv[options.key])
 
 # Validate and execute the set operation
 def execute_set(options, parser):
-  print("Setting %s!" % options.key)
+  if options.value == None:
+    parser.error("Value requried")
+    exit(1)
+  okv = pyopenkeyval()
+  okv[options.key] = options.value
 
 # Validate and execute the del operation
 def execute_del(options, parser):
-  print("Deleting %s!" % options.key)
+  okv = pyopenkeyval()
+  del okv[options.key]
 
 
 # Get the key prefix
 def get_key_prefix(options, parser):
-   # If the user specified to not use a prefix, return an empty string
+   # If the user specified to not use a prefix, prepand an empty string
+   # to the key. Otherwise, attempt to prepend the OKV_PREFIX environment
+   # variable to the key
    if options.noPrefix:
-   	 return ""
-
+   	 options.key = "" + options.key
+   else:
+     if "OKV_PREFIX" in os.environ.keys():
+       options.key = os.environ["OKV_PREFIX"] + "_" +  options.key 
+     else:
+     	 print("OKV_PREFIX environment variable not found but -n not passed")
+     	 exit(1)
 
 if __name__ == "__main__":
 	run()
