@@ -1,4 +1,4 @@
-#!usr/bin/env python
+#!/usr/bin/env python
 
 ##################################################################
 # OpenKeyval command line interface!
@@ -10,7 +10,7 @@
 
 import sys
 from optparse import OptionParser
-from pyopenkeyval import pyopenkeyval
+from pyopenkeyval.pyopenkeyval import pyopenkeyval
 
 usage = "Usage: %prog [set|get|del] [args]"
 parser = OptionParser(usage=usage)
