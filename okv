@@ -1,0 +1,44 @@
+#!usr/bin/env python
+
+##################################################################
+# OpenKeyval command line interface!
+# Here are some example calls:
+# okv set -k someKey -v someVal
+# okv del -k someKey 
+# okv get -k someKey 
+##################################################################
+
+import sys
+from optparse import OptionParser
+from pyopenkeyval import pyopenkeyval
+
+usage = "Usage: %prog [set|get|del] [args]"
+parser = OptionParser(usage=usage)
+parser.add_option("-k", "--key", dest="key", help="Key")
+parser.add_option("-v", "--value", dest="value", help="Value")
+
+(options, args) = parser.parse_args(sys.argv)
+operation = sys.argv[1]
+okv = pyopenkeyval()
+
+if operation == 'set': 
+  try:
+    key = options.key
+    okv[key] = options.value
+  except:
+    exit(1)
+elif operation == 'get':
+  try:
+    key = options.key
+    remoteVal = okv[key]
+    print(remoteVal)
+  except: 
+    exit(1)
+elif operation == 'del':
+  try:
+    key = options.key
+    del okv[key]
+  except: 
+    exit(1)
+else:
+	parser.error("Incorrect operation provided.")
