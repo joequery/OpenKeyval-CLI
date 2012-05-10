@@ -67,7 +67,7 @@ class pyopenkeyval(object):
     def store(self, key, value):
         """Stores `value` on `key`, returns a dict of the parsed JSON response."""
         self._remove_cache(key)
-        data = "data=" + urllib.quote(value)
+        data = "data=" + urllib.quote(str(value))
         result = urllib2.urlopen(self._api_url % key, data).read()
         return json.loads(result.decode())
 
@@ -82,7 +82,7 @@ class pyopenkeyval(object):
 
     def _update_cache(self, key, value):
         if self._cache_time:
-            self._cache[key] = (value, time.time())
+            self._cache[key] = (str(value), time.time())
 
     def _remove_cache(self, key):
         if self._cache_time and key in self._cache:
