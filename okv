@@ -56,7 +56,11 @@ def execute_get(prefix, options, parser):
   	exit(1)
   okv = pyopenkeyval()
   key = "%s%s" %(prefix, options.key)
-  print(okv[key])
+  try:
+    val = okv[key]
+    print(val)
+  except KeyError:
+    pass
 
 # Validate and execute the set operation
 def execute_set(prefix, options, parser):
